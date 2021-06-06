@@ -1,6 +1,7 @@
 [UC Surface]: https://www.presonus.com/products/UC-Surface
+[UCNET Protocol]: https://www.presonussoftware.com/en_US/technology
 
-# PreSonus StudioLive III | Packet Research
+# PreSonus UCNET | Packet Research
 
 ---
 
@@ -19,8 +20,8 @@ There are different formats of payloads, identified by a two byte preamble prece
 |`KA`|KeepAlive|
 |`UM`|Hello|
 |`JM`|JSON|
-|`PV`|Setting|
-|`PL`|Device List|
+|`PV`|Parameter Value|
+|`PL`|Parameter List|
 |`FR`|File Request|
 |`FD`|FileResource 2|
 |`BO`|?????????|
@@ -65,7 +66,7 @@ For most cases it looks like they're not too important to keep synchronised - Bu
 |4-5|Payload Size||
 |6-7|Payload Type|`UM`|
 |8-11|C-Bytes||
-|12->13|Payload Data|`TCP Window Size + 1` ???|
+|12->13|UDP port, little endian|`UDP port on the app to receive mixer values`|
 
 ## Subscribe
 
@@ -105,13 +106,13 @@ For most cases it looks like they're not too important to keep synchronised - Bu
 |Key                 |Type     |Description|Known Values|
 |:-------------------|:--------|:----------|:-----------|
 |`id`                |_string_ |Action     |`"Subscribe"`|
-|`clientName`        |_string_ |Name|`"Universal Control"`/`"UC-Surface"`|  
+|`clientName`        |_string_ |Name|`"Universal Control"`, `"Universal Control AI"`, `"UC-Surface"`|  
 |`clientInternalName`|_string_ |Internal name|`"ucapp"`/`"ucremoteapp"`|
 |`clientType`        |_string_ |Client platform||`"PC"`,`"Android"`|
 |`clientDescription` |_string_ |Visible name||
 |`clientIdentifier`  |_string_ |ID         ||
 |`clientOptions`     |_string_ |???        |`"perm users levl redu rtan"`|
-|`clientEncoding`    |_integer_|???        |`23106`|
+|`clientEncoding`    |_integer_|???        |`23117`, `23106`|
 
 ## File Request
 
@@ -141,7 +142,7 @@ For most cases it looks like they're not too important to keep synchronised - Bu
 
 ## Settings
 
-Setting packets have a payload type code of `0x50 0x56` (`PV`).
+Parameter packets have a payload type code of `0x50 0x56` (`PV`).
 
 ### Format
 
@@ -172,7 +173,8 @@ However, for keys related to filter groups, `partA` is `0x00 0x01` and `partB` i
 |:----|:----------|
 |0-3|Header|
 |4-5|Source Port (2 byte little endian)|
-|6-23|???|
+|6-8|DA|Discovery Advertisement?|
+|9-23|???|
 |24->?|Console Model*|
 
 *The first "StudioLLive 24R" is used to identify the icon in [UC Surface]. The second instance appears to be some sort of friendly name
